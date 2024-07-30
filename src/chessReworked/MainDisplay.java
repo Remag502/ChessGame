@@ -1,6 +1,5 @@
 package chessReworked;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.util.Scanner;
