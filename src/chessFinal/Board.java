@@ -16,12 +16,12 @@ public class Board {
 
 	// Class stores data of JPanels
 	// Handles logical components of game
-	private static Square[][] squares;
+	private static Square[][] squares = new Square[8][8];
+	private static boolean whiteTurn = true;
 
 	// Uses given JPanel to display contents of board
 	public Board(JPanel boardPanel) {
-		
-		squares = new Square[8][8];
+
 		boardPanel.setBorder(new EmptyBorder(0, 5, 5, 5));
 		boardPanel.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
 		initializeBackground(boardPanel);
@@ -102,39 +102,15 @@ public class Board {
 
 	public static void movePiece(Square square, int x, int y) {
 		
+		if (!legalMove(square, x, y))
+			return;
+		
 		squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
 		
 		square.repaintSquare();
 		squares[x][y].repaintSquare();
 	}
-	
-//	public static Point findSquareCoordsWithLabel(JLabel label) {
-//		
-//		int i, j=0;
-//		boolean found = false;
-//		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(), squares[0][0].getParent());
-//		// Get the bounds of the JLabel
-//		System.out.println("Optimize test: " + labelBounds);
-//		
-//		for (i = 0; i < 8; i++) {
-//			for (j = 0; j < 8; j++) {
-//				
-//			    // Get the bounds of the JPanel
-//			    Rectangle panelBounds = squares[i][j].getBounds();
-//			    // Check if the bounds intersect
-//			    if (labelBounds.intersects(panelBounds)) {
-//			    	found = true;
-//			    	break; // Breaks on overlap
-//			    }
-//			}
-//			
-//			if (found) break;	
-//		}
-//		
-////		System.out.println(i + " " + j);
-//		return (found) ? new Point(i, j): null;
-//	}
 
 	public static Point findSquareCoordsWithLabel(JLabel label) {
 	    int maxIntersectionArea = 0;
@@ -150,7 +126,6 @@ public class Board {
 	            // Calculate the intersection area
 	            Rectangle intersection = labelBounds.intersection(panelBounds);
 	            int intersectionArea = intersection.width * intersection.height;
-	            System.out.println(intersectionArea + " " + i + " " + j);
 
 	            // Check if this is the largest intersection so far
 	            if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
@@ -160,14 +135,16 @@ public class Board {
 	        }
 	    }
 
-	    // Debug output
-	    if (bestMatch != null) {
-	        System.out.println("Best match found at: " + bestMatch.x + ", " + bestMatch.y + " with area: " + maxIntersectionArea);
-	    } else {
-	        System.out.println("No intersection found.");
-	    }
-
 	    return bestMatch;
+	}
+	
+	private static boolean legalMove(Square square, int x, int y) {
+		// Check if is its the player's turn
+		if (square.getPiece().side == whiteTurn) {
+			whiteTurn = !whiteTurn; 
+			return true;
+		}
+		return false;
 	}
 	
 }
