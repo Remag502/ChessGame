@@ -84,42 +84,44 @@ public class Square extends JPanel {
 
 	// Statically initializes each image, but can read instances
 	public void setPiecePictures() {
+		int width = getWidth();
+		int height = width; // maintain square shape
 		try { // Maybe we can use an array for images and a for loop to go through each file
 			BufferedImage img = ImageIO.read(new File("images/white_pawn.png"));
-			Image dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			Image dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_PAWN = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_pawn.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_PAWN = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/white_bishop.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_BISHOP = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_bishop.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_BISHOP = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/white_knight.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_KNIGHT = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_knight.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_KNIGHT = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/white_rook.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_ROOK = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_rook.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_ROOK = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/white_queen.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_QUEEN = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_queen.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_QUEEN = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/white_king.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			WHITE_KING = new ImageIcon(dimg);
 			img = ImageIO.read(new File("images/black_king.png"));
-			dimg = img.getScaledInstance(getWidth() - 10, getHeight() - 10, Image.SCALE_SMOOTH);
+			dimg = img.getScaledInstance(width - 10, height - 10, Image.SCALE_SMOOTH);
 			BLACK_KING = new ImageIcon(dimg);
 		} catch (IOException e) {
 			e.printStackTrace();

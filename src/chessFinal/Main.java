@@ -12,7 +12,7 @@ public class Main {
 				try {
 					
 					Display frame = new Display();
-					frame.boardPanel.setBounds(0, 0, 784, 761);
+					
 					frame.setVisible(true); // Display and squares needs to be set so the size of each panel can be measured for the pieces
 					
 					

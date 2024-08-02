@@ -16,19 +16,16 @@ public class Board {
 	private static Square[][] squares;
 
 	// Uses given JPanel to display contents of board
-	public Board(JPanel boardPane) {
+	public Board(JPanel boardPanel) {
 		
 		squares = new Square[8][8];
-		boardPane.setBounds(0, 0, Display.layeredPane.getWidth(), Display.layeredPane.getHeight());
-//		boardPane.setBounds(0, 0, 750, 750);
-//		boardPane.setBackground(Color.RED);
-		boardPane.setBorder(new EmptyBorder(0, 5, 5, 5));
-		boardPane.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
-		initializeBackground(boardPane);
+		boardPanel.setBorder(new EmptyBorder(0, 5, 5, 5));
+		boardPanel.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
+		initializeBackground(boardPanel);
 		setupBoard();
 	}
 
-	private void initializeBackground(JPanel boardPane) {
+	private void initializeBackground(JPanel boardPanel) {
 
 		int number = 0; // Used to have alternating colors
 		for (int i = 0; i < 8; i++) {
@@ -38,7 +35,7 @@ public class Board {
 				squares[i][j] = new Square(defaultColor, i, j);
 				number++;
 				// Add square to our JFrame
-				boardPane.add(squares[i][j], i, j);
+				boardPanel.add(squares[i][j], i, j);
 
 			}
 		}
@@ -82,8 +79,9 @@ public class Board {
 		squares[6][7].setPiece(new Piece(Piece.PAWN, false));
 	}
 	
-	public void resizeImages() {
+	public void resizeBoard(JPanel boardPanel) {
 //		 Gets a random square to resize each image
+		boardPanel.setBounds(0, 0, Display.layeredPane.getWidth(), Display.layeredPane.getHeight());
 		if (squares[0][0] != null)
 			squares[0][0].setPiecePictures();
 		repaintBoard();
