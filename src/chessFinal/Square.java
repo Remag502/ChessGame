@@ -12,18 +12,21 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 public class Square extends JPanel {
 
-	boolean defaultColor; // black is 0, white is 1
-	int posX, posY;
-	Piece piece;
-	JLabel img;
+	private boolean defaultColor; // black is 0, white is 1
+	private int posX, posY;
+	private Piece piece;
+	private JLabel img;
+	private Square squareInstance;
 	// Statically declaration (resizing) for needed images, this class primarily
 	// handles graphics
 	private static ImageIcon WHITE_PAWN, WHITE_BISHOP, WHITE_ROOK, WHITE_KNIGHT, WHITE_QUEEN, WHITE_KING, BLACK_PAWN,
@@ -35,6 +38,7 @@ public class Square extends JPanel {
 		this.posX = posX;
 		this.posY = posY;
 		img = new JLabel();
+		squareInstance = this;
 		// Set background color
 		if (defaultColor)
 			setBackground(Color.DARK_GRAY);
@@ -48,7 +52,11 @@ public class Square extends JPanel {
 	public void setPiece(Piece piece) {
 		this.piece = piece;
 	}
-
+	
+	public Piece getPiece() {
+		return piece;
+	}
+	
 	public void repaintSquare() {
 
 		int num = piece != null ? piece.type : -1;
@@ -79,8 +87,9 @@ public class Square extends JPanel {
 			img.setIcon(null); // In case of an undefined type, clear the icon
 			break;
 		}
+		
 	}
-	// Should I move this to piece.java
+
 
 	// Statically initializes each image, but can read instances
 	public void setPiecePictures() {
@@ -146,7 +155,11 @@ public class Square extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
+				Point pos = Board.findSquareCoordsWithLabel(img);
 				stopImageFollowing();
+				if (pos != null)
+					Board.movePiece(squareInstance, pos.x, pos.y);
+//				Board.movePiece(Board.squares[1][4], 4, 4);
 			}
 
 			@Override

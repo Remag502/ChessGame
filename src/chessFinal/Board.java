@@ -2,11 +2,14 @@ package chessFinal;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 public class Board {
@@ -97,6 +100,74 @@ public class Board {
 
 	}
 
+	public static void movePiece(Square square, int x, int y) {
+		
+		squares[x][y].setPiece(square.getPiece());
+		square.setPiece(null);
+		
+		square.repaintSquare();
+		squares[x][y].repaintSquare();
+	}
+	
+//	public static Point findSquareCoordsWithLabel(JLabel label) {
+//		
+//		int i, j=0;
+//		boolean found = false;
+//		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(), squares[0][0].getParent());
+//		// Get the bounds of the JLabel
+//		System.out.println("Optimize test: " + labelBounds);
+//		
+//		for (i = 0; i < 8; i++) {
+//			for (j = 0; j < 8; j++) {
+//				
+//			    // Get the bounds of the JPanel
+//			    Rectangle panelBounds = squares[i][j].getBounds();
+//			    // Check if the bounds intersect
+//			    if (labelBounds.intersects(panelBounds)) {
+//			    	found = true;
+//			    	break; // Breaks on overlap
+//			    }
+//			}
+//			
+//			if (found) break;	
+//		}
+//		
+////		System.out.println(i + " " + j);
+//		return (found) ? new Point(i, j): null;
+//	}
 
+	public static Point findSquareCoordsWithLabel(JLabel label) {
+	    int maxIntersectionArea = 0;
+	    Point bestMatch = null;
+	    // Get the bounds of the JLabel
+	    Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(), squares[0][0].getParent());
 
+	    for (int i = 0; i < 8; i++) {
+	        for (int j = 0; j < 8; j++) {
+	            
+	            // Get the bounds of the JPanel
+	            Rectangle panelBounds = squares[i][j].getBounds();
+	            // Calculate the intersection area
+	            Rectangle intersection = labelBounds.intersection(panelBounds);
+	            int intersectionArea = intersection.width * intersection.height;
+	            System.out.println(intersectionArea + " " + i + " " + j);
+
+	            // Check if this is the largest intersection so far
+	            if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
+	                maxIntersectionArea = intersectionArea;
+	                bestMatch = new Point(i, j);
+	            }
+	        }
+	    }
+
+	    // Debug output
+	    if (bestMatch != null) {
+	        System.out.println("Best match found at: " + bestMatch.x + ", " + bestMatch.y + " with area: " + maxIntersectionArea);
+	    } else {
+	        System.out.println("No intersection found.");
+	    }
+
+	    return bestMatch;
+	}
+	
 }
