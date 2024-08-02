@@ -1,9 +1,14 @@
 package chessFinal;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -11,8 +16,9 @@ public class Display extends JFrame {
 
 	private static final double ASPECT_RATIO = 1.0; // Keeps the window squared
 //	private static Square[][] squares = new Square[8][8];
-	private JPanel contentPane;
-	private Board board;
+	public static JLayeredPane layeredPane;
+	public static JPanel boardPanel;
+	private static Board board;
 
 	public Display() {
 		
@@ -21,20 +27,23 @@ public class Display extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupSizing();
 		// Setup content pane for viewing items
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(0, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
-		// Creates a board to be setup on a given JPanel
-		board = new Board(contentPane);
-//		setupBoard(); // has uneven images that gets fixed on component listener during repaint
+		layeredPane = new JLayeredPane();
+		layeredPane.setBounds(0, 0, 800, 800);
+//		setContentPane(contentPane);
+		setLayout(new BorderLayout());
+//		add(layeredPane, BorderLayout.CENTER);
+		setContentPane(layeredPane);
+		boardPanel = new JPanel();
+		// Sets up the board JPanel to be on the back layer of JLayeredPane
+		board = new Board(boardPanel);
+		layeredPane.add(boardPanel, JLayeredPane.DEFAULT_LAYER);
 	}
 
 	void setupSizing() {
 
 		setResizable(true);
-		setBounds(100, 100, 800, 800);
-		
+		setBounds(400, 200, 800, 800);
+		setVisible(true);
 
 		// Add a component listener to handle resizing events
 		addComponentListener(new ComponentAdapter() {

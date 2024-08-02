@@ -2,6 +2,7 @@ package chessFinal;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,7 +14,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class Square extends JPanel {
 
@@ -27,7 +30,7 @@ public class Square extends JPanel {
 			BLACK_BISHOP, BLACK_ROOK, BLACK_KNIGHT, BLACK_QUEEN, BLACK_KING;
 
 	public Square(boolean defaultColor, int posX, int posY) {
-
+		
 		this.defaultColor = defaultColor;
 		this.posX = posX;
 		this.posY = posY;
@@ -167,23 +170,29 @@ public class Square extends JPanel {
 		});
 	}
 	
-	// Method to start following the cursor with the image
-		private void startImageFollowing(MouseEvent e) {
-			img.setVisible(true); // Make the image visible if it's hidden
-			moveImageWithCursor(e); // Start by moving the image to the cursor position
-		}
+	 // Method to start following the cursor with the image
+    private void startImageFollowing(MouseEvent e) {
+        img.setVisible(true);
+        remove(img); // Remove from the current square
+        Display.layeredPane.add(img, JLayeredPane.DRAG_LAYER); // Add to the layered pane
+        moveImageWithCursor(e); // Move the image to the cursor position
+    }
 
-		// Method to stop following the cursor with the image
-		private void stopImageFollowing() {
-			img.setVisible(false); // Hide the image when the mouse is released
-		}
+    // Method to stop following the cursor with the image
+    private void stopImageFollowing() {
+        img.setVisible(true); // Keep the image visible when the mouse is released
+        Display.layeredPane.remove(img); // Remove from the layered pane
+        add(img); // Add back to the square
+        img.setLocation(5, 5); // Reset the position in the square
+        Display.layeredPane.repaint();
+        repaint();
+    }
 
-		// Method to move the image with the cursor
-		private void moveImageWithCursor(MouseEvent e) {
-			Point p = e.getPoint();
-			img.setLocation(p.x - img.getWidth() / 2, p.y - img.getHeight() / 2);
-			repaint(); // Repaint to update the position
-		}
+    // Method to move the image with the cursor
+    private void moveImageWithCursor(MouseEvent e) {
+        Point p = SwingUtilities.convertPoint(this, e.getPoint(), Display.layeredPane);
+        img.setLocation(p.x - img.getWidth() / 2, p.y - img.getHeight() / 2);
+        Display.layeredPane.repaint();
+    }
 }
-
 

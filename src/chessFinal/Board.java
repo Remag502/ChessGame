@@ -1,6 +1,13 @@
 package chessFinal;
 
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.MouseMotionListener;
+
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class Board {
 
@@ -9,13 +16,19 @@ public class Board {
 	private static Square[][] squares;
 
 	// Uses given JPanel to display contents of board
-	public Board(JPanel contentPane) {
+	public Board(JPanel boardPane) {
+		
 		squares = new Square[8][8];
-		initializeBackground(contentPane);
+		boardPane.setBounds(0, 0, Display.layeredPane.getWidth(), Display.layeredPane.getHeight());
+//		boardPane.setBounds(0, 0, 750, 750);
+//		boardPane.setBackground(Color.RED);
+		boardPane.setBorder(new EmptyBorder(0, 5, 5, 5));
+		boardPane.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
+		initializeBackground(boardPane);
 		setupBoard();
 	}
 
-	private void initializeBackground(JPanel contentPane) {
+	private void initializeBackground(JPanel boardPane) {
 
 		int number = 0; // Used to have alternating colors
 		for (int i = 0; i < 8; i++) {
@@ -25,7 +38,7 @@ public class Board {
 				squares[i][j] = new Square(defaultColor, i, j);
 				number++;
 				// Add square to our JFrame
-				contentPane.add(squares[i][j], i, j);
+				boardPane.add(squares[i][j], i, j);
 
 			}
 		}
@@ -85,5 +98,7 @@ public class Board {
 		}
 
 	}
+
+
 
 }
