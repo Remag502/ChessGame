@@ -31,15 +31,15 @@ public class Board {
 
 	private void initializeBackground(JPanel boardPanel) {
 
-		int number = 0; // Used to have alternating colors
-		for (int i = 0; i < 8; i++) {
+		int number = 0; // Used for alternating colors
+		for (int i = 7; i >= 0; i--) {
 			for (int j = 0; j < 8; j++) {
 				// Tinkered w/ line under to get correct color order
 				boolean defaultColor = ((i + number) % 2 == 1) ? false : true;
-				squares[i][j] = new Square(defaultColor, i, j);
+				squares[j][i] = new Square(defaultColor, j, i); // Follows x,y format with gui (Tinkered)
 				number++;
 				// Add square to our JFrame
-				boardPanel.add(squares[i][j], i, j);
+				boardPanel.add(squares[j][i]);
 
 			}
 		}
@@ -47,40 +47,40 @@ public class Board {
 	}
 
 	private void setupBoard() {
-		// White pieces
+		
 		squares[0][0].setPiece(new Piece(Piece.ROOK, true));
-		squares[0][1].setPiece(new Piece(Piece.KNIGHT, true));
-		squares[0][2].setPiece(new Piece(Piece.BISHOP, true));
-		squares[0][3].setPiece(new Piece(Piece.QUEEN, true));
-		squares[0][4].setPiece(new Piece(Piece.KING, true));
-		squares[0][5].setPiece(new Piece(Piece.BISHOP, true));
-		squares[0][6].setPiece(new Piece(Piece.KNIGHT, true));
-		squares[0][7].setPiece(new Piece(Piece.ROOK, true));
-		squares[1][0].setPiece(new Piece(Piece.PAWN, true));
+		squares[1][0].setPiece(new Piece(Piece.KNIGHT, true));
+		squares[2][0].setPiece(new Piece(Piece.BISHOP, true));
+		squares[3][0].setPiece(new Piece(Piece.QUEEN, true));
+		squares[4][0].setPiece(new Piece(Piece.KING, true));
+		squares[5][0].setPiece(new Piece(Piece.BISHOP, true));
+		squares[6][0].setPiece(new Piece(Piece.KNIGHT, true));
+		squares[7][0].setPiece(new Piece(Piece.ROOK, true));
+		squares[0][1].setPiece(new Piece(Piece.PAWN, true));
 		squares[1][1].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][2].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][3].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][4].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][5].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][6].setPiece(new Piece(Piece.PAWN, true));
-		squares[1][7].setPiece(new Piece(Piece.PAWN, true));
+		squares[2][1].setPiece(new Piece(Piece.PAWN, true));
+		squares[3][1].setPiece(new Piece(Piece.PAWN, true));
+		squares[4][1].setPiece(new Piece(Piece.PAWN, true));
+		squares[5][1].setPiece(new Piece(Piece.PAWN, true));
+		squares[6][1].setPiece(new Piece(Piece.PAWN, true));
+		squares[7][1].setPiece(new Piece(Piece.PAWN, true));
 		// Black pieces
-		squares[7][0].setPiece(new Piece(Piece.ROOK, false));
-		squares[7][1].setPiece(new Piece(Piece.KNIGHT, false));
-		squares[7][2].setPiece(new Piece(Piece.BISHOP, false));
-		squares[7][3].setPiece(new Piece(Piece.QUEEN, false));
-		squares[7][4].setPiece(new Piece(Piece.KING, false));
-		squares[7][5].setPiece(new Piece(Piece.BISHOP, false));
-		squares[7][6].setPiece(new Piece(Piece.KNIGHT, false));
+		squares[0][7].setPiece(new Piece(Piece.ROOK, false));
+		squares[1][7].setPiece(new Piece(Piece.KNIGHT, false));
+		squares[2][7].setPiece(new Piece(Piece.BISHOP, false));
+		squares[3][7].setPiece(new Piece(Piece.QUEEN, false));
+		squares[4][7].setPiece(new Piece(Piece.KING, false));
+		squares[5][7].setPiece(new Piece(Piece.BISHOP, false));
+		squares[6][7].setPiece(new Piece(Piece.KNIGHT, false));
 		squares[7][7].setPiece(new Piece(Piece.ROOK, false));
-		squares[6][0].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][1].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][2].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][3].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][4].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][5].setPiece(new Piece(Piece.PAWN, false));
+		squares[0][6].setPiece(new Piece(Piece.PAWN, false));
+		squares[1][6].setPiece(new Piece(Piece.PAWN, false));
+		squares[2][6].setPiece(new Piece(Piece.PAWN, false));
+		squares[3][6].setPiece(new Piece(Piece.PAWN, false));
+		squares[4][6].setPiece(new Piece(Piece.PAWN, false));
+		squares[5][6].setPiece(new Piece(Piece.PAWN, false));
 		squares[6][6].setPiece(new Piece(Piece.PAWN, false));
-		squares[6][7].setPiece(new Piece(Piece.PAWN, false));
+		squares[7][6].setPiece(new Piece(Piece.PAWN, false));
 	}
 	
 	public void resizeBoard(JPanel boardPanel) {
@@ -141,7 +141,7 @@ public class Board {
 	
 	private static boolean legalMove(Square square, int x, int y) {
 		
-		System.out.println("Square piece wants to go: " + x + " " + y);
+//		System.out.println("Square piece wants to go: " + x + " " + y);
 		// Check if is its the player's turn
 		if (square.getPiece().isWhite != whiteTurn)
 			return false;
@@ -149,7 +149,7 @@ public class Board {
 		ArrayList<Point> moves = square.getPiece().emptyBoardMoves(square.getPosX(), square.getPosY());
 		// Loop through possible moves and check if legalMove is within it
 		for (int i = 0; i < moves.size(); i++) {
-			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
+//			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
 			if (moves.get(i).x == x && moves.get(i).y == y) {
 				whiteTurn = !whiteTurn;
 				return true; // Legal move found!

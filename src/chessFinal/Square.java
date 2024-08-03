@@ -157,6 +157,7 @@ public class Square extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
+				System.out.println("You clicked on square " + squareInstance.posX + " " + squareInstance.posY);
 				startImageFollowing(e);
 			}
 
@@ -167,6 +168,7 @@ public class Square extends JPanel {
 				stopImageFollowing();
 				if (pos != null)
 					Board.movePiece(squareInstance, pos.x, pos.y);
+				System.out.println("You released on square " + pos.x + " " + pos.y);
 //				Board.movePiece(Board.squares[1][4], 4, 4);
 			}
 
