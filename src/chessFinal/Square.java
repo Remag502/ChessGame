@@ -49,6 +49,14 @@ public class Square extends JPanel {
 		handleInput();
 	}
 
+	public int getPosX() {
+		return posX;
+	}
+
+	public int getPosY() {
+		return posY;
+	}
+	
 	public void setPiece(Piece piece) {
 		this.piece = piece;
 	}

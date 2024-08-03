@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -139,10 +140,20 @@ public class Board {
 	}
 	
 	private static boolean legalMove(Square square, int x, int y) {
+		
+		System.out.println("Square piece wants to go: " + x + " " + y);
 		// Check if is its the player's turn
-		if (square.getPiece().side == whiteTurn) {
-			whiteTurn = !whiteTurn; 
-			return true;
+		if (square.getPiece().isWhite != whiteTurn)
+			return false;
+		// Get piece moves in Point array
+		ArrayList<Point> moves = square.getPiece().emptyBoardMoves(square.getPosX(), square.getPosY());
+		// Loop through possible moves and check if legalMove is within it
+		for (int i = 0; i < moves.size(); i++) {
+			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
+			if (moves.get(i).x == x && moves.get(i).y == y) {
+				whiteTurn = !whiteTurn;
+				return true; // Legal move found!
+			}
 		}
 		return false;
 	}
