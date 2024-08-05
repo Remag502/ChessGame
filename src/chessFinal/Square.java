@@ -74,22 +74,22 @@ public class Square extends JPanel {
 			img.setIcon(null); // No piece, clear the icon
 			break;
 		case Piece.PAWN:
-			img.setIcon(piece.isWhite() ? WHITE_PAWN : BLACK_PAWN);
+			img.setIcon(piece.side() ? WHITE_PAWN : BLACK_PAWN);
 			break;
 		case Piece.BISHOP:
-			img.setIcon(piece.isWhite() ? WHITE_BISHOP : BLACK_BISHOP);
+			img.setIcon(piece.side() ? WHITE_BISHOP : BLACK_BISHOP);
 			break;
 		case Piece.ROOK:
-			img.setIcon(piece.isWhite() ? WHITE_ROOK : BLACK_ROOK);
+			img.setIcon(piece.side() ? WHITE_ROOK : BLACK_ROOK);
 			break;
 		case Piece.KNIGHT:
-			img.setIcon(piece.isWhite() ? WHITE_KNIGHT : BLACK_KNIGHT);
+			img.setIcon(piece.side() ? WHITE_KNIGHT : BLACK_KNIGHT);
 			break;
 		case Piece.QUEEN:
-			img.setIcon(piece.isWhite() ? WHITE_QUEEN : BLACK_QUEEN);
+			img.setIcon(piece.side() ? WHITE_QUEEN : BLACK_QUEEN);
 			break;
 		case Piece.KING:
-			img.setIcon(piece.isWhite() ? WHITE_KING : BLACK_KING);
+			img.setIcon(piece.side() ? WHITE_KING : BLACK_KING);
 			break;
 		default:
 			img.setIcon(null); // In case of an undefined type, clear the icon
@@ -157,7 +157,7 @@ public class Square extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				System.out.println("You clicked on square " + squareInstance.posX + " " + squareInstance.posY);
+//				System.out.println("You clicked on square " + squareInstance.posX + " " + squareInstance.posY);
 				startImageFollowing(e);
 			}
 
@@ -168,7 +168,7 @@ public class Square extends JPanel {
 				stopImageFollowing();
 				if (pos != null)
 					Board.movePiece(squareInstance, pos.x, pos.y);
-				System.out.println("You released on square " + pos.x + " " + pos.y);
+//				System.out.println("You released on square " + pos.x + " " + pos.y);
 //				Board.movePiece(Board.squares[1][4], 4, 4);
 			}
 

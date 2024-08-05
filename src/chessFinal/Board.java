@@ -143,10 +143,12 @@ public class Board {
 		
 //		System.out.println("Square piece wants to go: " + x + " " + y);
 		// Check if is its the player's turn
-		if (square.getPiece().isWhite != whiteTurn)
+		if (square.getPiece().side() != whiteTurn)
 			return false;
 		// Get piece moves in Point array
 		ArrayList<Point> moves = square.getPiece().emptyBoardMoves(square.getPosX(), square.getPosY());
+		// Remove obstructed pieces
+		// Add special cases
 		// Loop through possible moves and check if legalMove is within it
 		for (int i = 0; i < moves.size(); i++) {
 //			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
@@ -155,6 +157,25 @@ public class Board {
 				return true; // Legal move found!
 			}
 		}
+		return false;
+	}
+	
+	public static boolean freeSquare(int x, int y, boolean isWhite) {
+		// Check is empty
+		if (squares[x][y].getPiece() == null)
+			return true; 
+		if (capturableSquare(x, y, isWhite)) // Check if enemy piece
+			return true; 
+		return false; // Has same side piece
+	}
+	
+	public static boolean capturableSquare(int x, int y, boolean isWhite) {
+		
+		Piece piece = squares[x][y].getPiece();
+		if (piece == null) return false; // null check
+		
+		if ((piece.side() == Piece.BLACK && isWhite) || (piece.side() == Piece.WHITE && !isWhite))
+			return true;
 		return false;
 	}
 	
