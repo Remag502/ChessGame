@@ -15,8 +15,9 @@ public class Piece {
 	public static final boolean WHITE = true;
 	public static final boolean BLACK = false;
 
-	public int type;
+	public static boolean whiteKingMoved = false, blackKingMoved = false; // move to board?
 	private boolean isWhite;
+	public int type;
 
 	public Piece(int type, boolean side) {
 		this.type = type;
@@ -27,55 +28,67 @@ public class Piece {
 		return isWhite;
 	}
 
-	// Returns possible moves from piece given a location, assuming an empty board,
+	// Returns possible moves from piece given a location,
 	// in a point ArrayList
-	public ArrayList<Point> emptyBoardMoves(int x, int y) {
+	public ArrayList<Point> getPieceMoves(int x, int y) {
 
-		ArrayList<Point> rv = null;
+		ArrayList<Point> moves = null;
 		switch (type) {
 		case PAWN:
-			rv = pawnMoves(x, y);
+			moves = pawnMoves(x, y);
+			moves.addAll(pawnCapture(x, y));
+//			moves.addAll(enPessant(x, y));
+//			moves.addAll(pawnPromotion(x, y));
 			break;
 		case KNIGHT:
-			rv = knightMoves(x, y);
+			moves = knightMoves(x, y);
 			break;
 		case BISHOP:
-			rv = bishopMoves(x, y);
+			moves = bishopMoves(x, y);
 			break;
 		case ROOK:
-			rv = rookMoves(x, y);
+			moves = rookMoves(x, y);
 			break;
 		case QUEEN:
-			rv = queenMoves(x, y);
+			moves = queenMoves(x, y);
 			break;
 		case KING:
-			rv = kingMoves(x, y);
+			moves = kingMoves(x, y);
+			moves.addAll(castleKing(x, y));
 			break;
 		default:
 			return null;
 		}
 
-		return rv;
+		moves.addAll(pawnCapture(x, y));
+
+		return moves;
 	}
 
-	public ArrayList<Point> pawnMoves(int x, int y) {
+	private ArrayList<Point> pawnMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 
 		if (isWhite) {
-			addMove(moves, x, y + 1);
-			if (y == 1)
-				addMove(moves, x, y + 2);
+			if (!Board.capturableSquare(x, y + 1, isWhite))
+				addMove(moves, x, y + 1);
+			if (y == 1 && Board.freeSquare(x, y + 1, isWhite)) {
+				if (!Board.capturableSquare(x, y + 2, isWhite))
+					addMove(moves, x, y + 2);
+			}
 		} else {
-			addMove(moves, x, y - 1);
-			if (y == 6)
-				addMove(moves, x, y - 2);
+			if (!Board.capturableSquare(x, y - 1, isWhite))
+				addMove(moves, x, y - 1);
+			if (y == 6 && Board.freeSquare(x, y - 1, isWhite)) {
+				if (!Board.capturableSquare(x, y - 2, isWhite))
+					addMove(moves, x, y - 2);
+			}
 		}
 
 		return moves;
 	}
 
-	public ArrayList<Point> knightMoves(int x, int y) {
+	private ArrayList<Point> knightMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 
@@ -100,7 +113,7 @@ public class Piece {
 		return moves;
 	}
 
-	public ArrayList<Point> bishopMoves(int x, int y) {
+	private ArrayList<Point> bishopMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 		int i = x, j = y;
@@ -174,7 +187,7 @@ public class Piece {
 		return moves;
 	}
 
-	public ArrayList<Point> rookMoves(int x, int y) {
+	private ArrayList<Point> rookMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 		// Rook moves vertical down
@@ -226,7 +239,7 @@ public class Piece {
 		return moves;
 	}
 
-	public ArrayList<Point> queenMoves(int x, int y) {
+	private ArrayList<Point> queenMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 
@@ -236,7 +249,7 @@ public class Piece {
 		return moves;
 	}
 
-	public ArrayList<Point> kingMoves(int x, int y) {
+	private ArrayList<Point> kingMoves(int x, int y) {
 
 		ArrayList<Point> moves = new ArrayList<Point>();
 
@@ -271,5 +284,61 @@ public class Piece {
 	}
 
 	// Special cases: pawn capture, en pessant, pawn promotion, castle
+	private ArrayList<Point> pawnCapture(int x, int y) {
+
+		ArrayList<Point> moves = new ArrayList<Point>();
+
+		if (isWhite) {
+			if (Board.capturableSquare(x + 1, y + 1, isWhite))
+				moves.add(new Point(x + 1, y + 1)); // captures right diagnol
+			if (Board.capturableSquare(x - 1, y + 1, isWhite))
+				moves.add(new Point(x - 1, y + 1)); // captures left diagnol
+		} else {
+			if (Board.capturableSquare(x + 1, y - 1, isWhite))
+				moves.add(new Point(x - 1, y - 1)); // captures left diagnol
+			if (Board.capturableSquare(x - 1, y - 1, isWhite))
+				moves.add(new Point(x - 1, y - 1)); // captures right diagnol
+		}
+		return moves;
+	}
+
+	private ArrayList<Point> enPessant(int x, int y) {
+		return null;
+	}
+
+	private ArrayList<Point> pawnPromotion(int x, int y) {
+		return null;
+	}
+
+	private ArrayList<Point> castleKing(int x, int y) {
+
+		ArrayList<Point> moves = new ArrayList<Point>();
+
+		if (isWhite && !whiteKingMoved) {
+			// Castle right
+			if (Board.emptySquare(5, 0) && Board.emptySquare(6, 0)) {
+				moves.add(new Point(6, 0));
+			} else if (Board.emptySquare(1, 0) && Board.emptySquare(2, 0) && Board.emptySquare(3, 0)) { // Castle left
+				moves.add(new Point(2, 0));
+			}
+		} else if (!blackKingMoved) {
+			// Castle right
+			if (Board.emptySquare(5, 7) && Board.emptySquare(6, 7)) {
+				moves.add(new Point(6, 7));
+			} else if (Board.emptySquare(1, 7) && Board.emptySquare(2, 7) && Board.emptySquare(3, 7)) { // Castle left
+				moves.add(new Point(2, 7));
+			}
+		}
+
+		return moves;
+	}
+	
+	public static boolean isWhiteKingMoved() {
+		return whiteKingMoved;
+	}
+
+	public static boolean isBlackKingMoved() {
+		return blackKingMoved;
+	}
 
 }

@@ -47,7 +47,7 @@ public class Board {
 	}
 
 	private void setupBoard() {
-		
+
 		squares[0][0].setPiece(new Piece(Piece.ROOK, true));
 		squares[1][0].setPiece(new Piece(Piece.KNIGHT, true));
 		squares[2][0].setPiece(new Piece(Piece.BISHOP, true));
@@ -82,7 +82,7 @@ public class Board {
 		squares[6][6].setPiece(new Piece(Piece.PAWN, false));
 		squares[7][6].setPiece(new Piece(Piece.PAWN, false));
 	}
-	
+
 	public void resizeBoard(JPanel boardPanel) {
 //		 Gets a random square to resize each image
 		boardPanel.setBounds(0, 0, Display.layeredPane.getWidth(), Display.layeredPane.getHeight());
@@ -102,53 +102,65 @@ public class Board {
 	}
 
 	public static void movePiece(Square square, int x, int y) {
-		
+
 		if (!legalMove(square, x, y))
 			return;
-		
+		// Check special cases
+		checkSpecialCases(square.getPiece(), x, y);
+		// Change piece
 		squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
-		
+
+		square.repaintSquare();
+		squares[x][y].repaintSquare();
+	}
+
+	public static void forceMovePiece(Square square, int x, int y) {
+
+		// Change piece
+		squares[x][y].setPiece(square.getPiece());
+		square.setPiece(null);
+
 		square.repaintSquare();
 		squares[x][y].repaintSquare();
 	}
 
 	public static Point findSquareCoordsWithLabel(JLabel label) {
-	    int maxIntersectionArea = 0;
-	    Point bestMatch = null;
-	    // Get the bounds of the JLabel
-	    Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(), squares[0][0].getParent());
+		int maxIntersectionArea = 0;
+		Point bestMatch = null;
+		// Get the bounds of the JLabel
+		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(),
+				squares[0][0].getParent());
 
-	    for (int i = 0; i < 8; i++) {
-	        for (int j = 0; j < 8; j++) {
-	            
-	            // Get the bounds of the JPanel
-	            Rectangle panelBounds = squares[i][j].getBounds();
-	            // Calculate the intersection area
-	            Rectangle intersection = labelBounds.intersection(panelBounds);
-	            int intersectionArea = intersection.width * intersection.height;
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
 
-	            // Check if this is the largest intersection so far
-	            if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
-	                maxIntersectionArea = intersectionArea;
-	                bestMatch = new Point(i, j);
-	            }
-	        }
-	    }
+				// Get the bounds of the JPanel
+				Rectangle panelBounds = squares[i][j].getBounds();
+				// Calculate the intersection area
+				Rectangle intersection = labelBounds.intersection(panelBounds);
+				int intersectionArea = intersection.width * intersection.height;
 
-	    return bestMatch;
+				// Check if this is the largest intersection so far
+				if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
+					maxIntersectionArea = intersectionArea;
+					bestMatch = new Point(i, j);
+				}
+			}
+		}
+
+		return bestMatch;
 	}
-	
+
 	private static boolean legalMove(Square square, int x, int y) {
-		
-//		System.out.println("Square piece wants to go: " + x + " " + y);
+
 		// Check if is its the player's turn
 		if (square.getPiece().side() != whiteTurn)
 			return false;
 		// Get piece moves in Point array
-		ArrayList<Point> moves = square.getPiece().emptyBoardMoves(square.getPosX(), square.getPosY());
-		// Remove obstructed pieces
+		ArrayList<Point> moves = square.getPiece().getPieceMoves(square.getPosX(), square.getPosY());
 		// Add special cases
+
 		// Loop through possible moves and check if legalMove is within it
 		for (int i = 0; i < moves.size(); i++) {
 //			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
@@ -159,24 +171,59 @@ public class Board {
 		}
 		return false;
 	}
-	
+
 	public static boolean freeSquare(int x, int y, boolean isWhite) {
 		// Check is empty
-		if (squares[x][y].getPiece() == null)
-			return true; 
-		if (capturableSquare(x, y, isWhite)) // Check if enemy piece
-			return true; 
-		return false; // Has same side piece
+		if (emptySquare(x, y))
+			return true;
+		// Check if enemy piece
+		if (capturableSquare(x, y, isWhite))
+			return true;
+		// Has same side piece
+		return false;
 	}
-	
+
+	public static boolean emptySquare(int x, int y) {
+		if (x < 0 || x > 7 || y < 0 || y > 7)
+			return false; // Bounds check
+		if (squares[x][y].getPiece() == null)
+			return true;
+		return false;
+	}
+
 	public static boolean capturableSquare(int x, int y, boolean isWhite) {
-		
+
+		if (x < 0 || x > 7 || y < 0 || y > 7)
+			return false; // Bounds check
+
 		Piece piece = squares[x][y].getPiece();
-		if (piece == null) return false; // null check
-		
+		if (piece == null)
+			return false; // null check
+
 		if ((piece.side() == Piece.BLACK && isWhite) || (piece.side() == Piece.WHITE && !isWhite))
 			return true;
 		return false;
 	}
+
+	private static void checkSpecialCases(Piece piece, int x, int y) {
+		if (piece.type == Piece.KING) {
+
+			if (!Piece.isWhiteKingMoved() && (x == 6 && y == 0)) {
+				forceMovePiece(squares[7][0], 5, 0);
+//				squares[5][0].repaintSquare();
+			} else if (!Piece.isWhiteKingMoved() && (x == 2 && y == 0))
+				forceMovePiece(squares[0][0], 3, 0);
+			else if (!Piece.isBlackKingMoved() && (x == 6 && y == 7))
+				forceMovePiece(squares[7][7], 5, 7);
+			else if (!Piece.isBlackKingMoved() && (x == 2 && y == 7))
+				forceMovePiece(squares[0][7], 3, 7);
+			else if (piece.side() == Piece.WHITE)
+				Piece.whiteKingMoved = true;
+			else
+				Piece.blackKingMoved = true;
+		}
+	}
 	
+	// May implement later, useful for checks?
+//	public static boolean isTargeted(int x, int y, boolean isWhite)
 }
