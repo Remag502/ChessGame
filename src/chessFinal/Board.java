@@ -17,19 +17,21 @@ public class Board {
 
 	// Class stores data of JPanels
 	// Handles logical components of game
+	private static int trackMoves = 0;
+	
 	private Square[][] squares;
 	private boolean whiteTurn;
 	private int moves;
-	
+
 	public Board() {
 		whiteTurn = true;
 		squares = new Square[8][8];
 		moves = 0;
 	}
-	
+
 	// Uses given JPanel to display contents of board
 	public Board(JPanel boardPanel) {
-		
+
 		whiteTurn = true;
 		squares = new Square[8][8];
 		moves = 0;
@@ -123,7 +125,7 @@ public class Board {
 
 		square.repaintSquare();
 		Display.getBoard().squares[x][y].repaintSquare();
-		
+
 		addBoardToHistory();
 	}
 
@@ -235,57 +237,69 @@ public class Board {
 				Piece.blackKingMoved = true;
 		}
 	}
-	
+
 	public static void rollBack() {
-		Board board = Display.getBoard();
-		System.out.println(board);
-		if (board.moves <= 1) // Checks if a move has been played
-			return;
-		if (board.moves == Display.getMoveHistory().size()) // Latest move
-			board = Display.getMoveHistory().get(board.moves-2);
-		else
-			board = Display.getMoveHistory().get(board.moves-1);
-		System.out.println("Reached " + board.moves);
-		System.out.println(board);
-		changeBoard(board);
-//		board.resizeBoard(Display.boardPanel);
+		if (trackMoves <= 0) return;
+		trackMoves--;
+	    Piece[][] boardState = Display.getMoveHistory().get(trackMoves);
+	    restoreBoardState(boardState);
 	}
-	
-	public static void rollForward() {
-		Board board = Display.getBoard();
-		if (board.moves >= Display.getMoveHistory().size()) // Checks that isnt last played move
-			return;
-		board = Display.getMoveHistory().get(board.moves+1);
-		changeBoard(board);
-	}
-	
-	public static void addBoardToHistory() {
-//		Board board = Display.getBoard();
-//		board.moves++;
-//		Display.getMoveHistory().add(board);
-//		board = (Board) board.clone();
-//		// Copy so new moves dont affect old boards
-//		Display.setBoard(board);
-		
-		Board currentBoard = Display.getBoard().clone();
-	    Display.getMoveHistory().add(currentBoard);
-	    Display.getBoard().moves = Display.getMoveHistory().size(); // Update the moves variable based on history size
-	}
-	
-	public static void changeBoard(Board board) {
-	    Board currentBoard = Display.getBoard();
-	    // Copy over contents of squares array
+
+	public static void restoreBoardState(Piece[][] boardState) {
+	    Board board = Display.getBoard();
 	    for (int i = 0; i < 8; i++) {
 	        for (int j = 0; j < 8; j++) {
-	            currentBoard.squares[i][j].setPiece(board.squares[i][j].getPiece() != null ? board.squares[i][j].getPiece().clone() : null);
-//	            currentBoard.squares[i][j].repaintSquare(); // Ensure the UI reflects the new data
+	            board.squares[i][j].setPiece(boardState[i][j] != null ? boardState[i][j].clone() : null);
 	        }
 	    }
-	    currentBoard.whiteTurn = board.whiteTurn;
-	    currentBoard.moves = board.moves;
-//	    currentBoard.repaintBoard();
+	    board.repaintBoard();
+	    board.moves = trackMoves;
+	    board.whiteTurn = (board.moves % 2 == 0) ? true: false;
 	}
 	
+//	public static void rollForward() {
+//		Board board = Display.getBoard();
+//		if (board.moves >= Display.getMoveHistory().size()) // Checks that isnt last played move
+//			return;
+//		board = Display.getMoveHistory().get(board.moves+1);
+//		changeBoard(board);
+//	}
+
+	public static void addBoardToHistory() {
+		// Remove moves until caught up to current position
+		System.out.println(Display.getMoveHistory().size() + " " + trackMoves);
+		
+		while (Display.getMoveHistory().size() != trackMoves+1 && Display.getMoveHistory().size() != 0)
+			Display.getMoveHistory().pop();
+			
+		Piece[][] boardState = new Piece[8][8];
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				boardState[i][j] = Display.getBoard().squares[i][j].getPiece() != null
+						? Display.getBoard().squares[i][j].getPiece().clone() // Ensure deep copy
+						: null;
+			}
+		}
+		Display.getMoveHistory().add(boardState);
+		Display.getBoard().moves = Display.getMoveHistory().size()-1; // Update the moves variable
+		trackMoves = Display.getBoard().moves;
+	}
+
+	public static void changeBoard(Board board) {
+		Board currentBoard = Display.getBoard();
+		// Copy over contents of squares array
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				currentBoard.squares[i][j].setPiece(
+						board.squares[i][j].getPiece() != null ? board.squares[i][j].getPiece().clone() : null);
+//	            currentBoard.squares[i][j].repaintSquare(); // Ensure the UI reflects the new data
+			}
+		}
+		currentBoard.whiteTurn = board.whiteTurn;
+		currentBoard.moves = board.moves;
+//	    currentBoard.repaintBoard();
+	}
+
 	// Create a deep copy
 	@Override
 	public Board clone() {
@@ -301,45 +315,45 @@ public class Board {
 		rv.moves = original.moves;
 		return rv;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-	    for (int y = 7; y >= 0; y--) { // Print from top to bottom (row 7 to 0)
-	        for (int x = 0; x < 8; x++) {
-	            Piece piece = squares[x][y].getPiece();
-	            if (piece == null) {
-	                sb.append(". ");
-	            } else {
-	                char pieceChar = ' ';
-	                switch (piece.type) {
-	                    case Piece.PAWN:
-	                        pieceChar = 'P';
-	                        break;
-	                    case Piece.ROOK:
-	                        pieceChar = 'R';
-	                        break;
-	                    case Piece.KNIGHT:
-	                        pieceChar = 'N'; // N for Knight to avoid conflict with King
-	                        break;
-	                    case Piece.BISHOP:
-	                        pieceChar = 'B';
-	                        break;
-	                    case Piece.QUEEN:
-	                        pieceChar = 'Q';
-	                        break;
-	                    case Piece.KING:
-	                        pieceChar = 'K';
-	                        break;
-	                }
-	                sb.append(piece.side() ? pieceChar : Character.toLowerCase(pieceChar)).append(" ");
-	            }
-	        }
-	        sb.append("\n"); // New line after each row
-	    }
-	    return sb.toString();
+		for (int y = 7; y >= 0; y--) { // Print from top to bottom (row 7 to 0)
+			for (int x = 0; x < 8; x++) {
+				Piece piece = squares[x][y].getPiece();
+				if (piece == null) {
+					sb.append(". ");
+				} else {
+					char pieceChar = ' ';
+					switch (piece.type) {
+					case Piece.PAWN:
+						pieceChar = 'P';
+						break;
+					case Piece.ROOK:
+						pieceChar = 'R';
+						break;
+					case Piece.KNIGHT:
+						pieceChar = 'N'; // N for Knight to avoid conflict with King
+						break;
+					case Piece.BISHOP:
+						pieceChar = 'B';
+						break;
+					case Piece.QUEEN:
+						pieceChar = 'Q';
+						break;
+					case Piece.KING:
+						pieceChar = 'K';
+						break;
+					}
+					sb.append(piece.side() ? pieceChar : Character.toLowerCase(pieceChar)).append(" ");
+				}
+			}
+			sb.append("\n"); // New line after each row
+		}
+		return sb.toString();
 	}
-	
+
 	// May implement later, useful for checks?
 //	public static boolean isTargeted(int x, int y, boolean isWhite)
 }

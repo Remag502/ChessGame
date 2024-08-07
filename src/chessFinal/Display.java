@@ -30,7 +30,7 @@ public class Display extends JFrame {
 	public static JLayeredPane layeredPane;
 	public static JPanel boardPanel;
 	private static Board board;
-	private static Stack<Board> moveHistory;
+	private static Stack<Piece[][]> moveHistory;
 
 	public Display() {
 
@@ -46,7 +46,7 @@ public class Display extends JFrame {
 		setContentPane(layeredPane);
 		boardPanel = new JPanel();
 		// Sets up the board JPanel to be on the back layer of JLayeredPane
-		moveHistory = new Stack<Board>();
+		moveHistory = new Stack<Piece[][]>();
 		handleInput();
 		board = new Board(boardPanel);
 		Board.addBoardToHistory();
@@ -86,7 +86,7 @@ public class Display extends JFrame {
 
 	}
 
-	public static Stack<Board> getMoveHistory() {
+	public static Stack<Piece[][]> getMoveHistory() {
 		return moveHistory;
 	}
 
@@ -116,13 +116,13 @@ public class Display extends JFrame {
 				
 				case KeyEvent.VK_LEFT:
 					// Call method to rollback a move
-					System.out.println("Left arrow key pressed");
+//					System.out.println("Left arrow key pressed");
 					Board.rollBack();
 					break;
 				case KeyEvent.VK_RIGHT:
 					// Call method to roll forward a move
-					System.out.println("Right arrow key pressed");
-					Board.rollForward();
+//					System.out.println("Right arrow key pressed");
+//					Board.rollForward();
 					break;
 				}
 			}
