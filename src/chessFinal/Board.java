@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
@@ -127,6 +128,7 @@ public class Board {
 		Display.getBoard().squares[x][y].repaintSquare();
 
 		addBoardToHistory();
+		
 	}
 
 	public static void forceMovePiece(Square square, int x, int y) {
@@ -235,7 +237,38 @@ public class Board {
 				Piece.whiteKingMoved = true;
 			else
 				Piece.blackKingMoved = true;
-		}
+		} else if (piece.type == Piece.PAWN && (y == 0 || y == 7)) // Checks if pawn is on end rows
+			promotePawn(piece);
+	}
+	
+	private static void promotePawn(Piece piece) {
+		// Prompt the player to choose a piece
+	    String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+	    int choice = JOptionPane.showOptionDialog(null, 
+	        "Choose a piece to promote your pawn to:", 
+	        "Pawn Promotion", 
+	        JOptionPane.DEFAULT_OPTION, 
+	        JOptionPane.QUESTION_MESSAGE, 
+	        null, 
+	        options, 
+	        options[0]);
+	    
+	    switch (choice) {
+	        case 0: // Queen
+	            piece.type = Piece.QUEEN;
+	            break;
+	        case 1: // Rook
+	        	piece.type = Piece.ROOK;
+	            break;
+	        case 2: // Bishop
+	        	piece.type = Piece.BISHOP;
+	            break;
+	        case 3: // Knight
+	        	piece.type = Piece.KNIGHT;
+	            break;
+	        default:
+	            return; // No valid choice
+	    }
 	}
 
 	public static void rollBack() {
@@ -267,8 +300,6 @@ public class Board {
 
 	public static void addBoardToHistory() {
 		// Remove moves until caught up to current position
-		System.out.println(Display.getMoveHistory().size() + " " + trackMoves);
-		
 		while (Display.getMoveHistory().size() != trackMoves+1 && Display.getMoveHistory().size() != 0)
 			Display.getMoveHistory().pop();
 			

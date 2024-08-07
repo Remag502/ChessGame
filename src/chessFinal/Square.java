@@ -228,9 +228,6 @@ public class Square extends JPanel {
         if (this.piece != null) {
             clonedSquare.setPiece((Piece) this.piece.clone());
         }
-        
-        // Set the icon for the cloned square's JLabel based on the piece
-//        clonedSquare.repaintSquare();
 
         return clonedSquare;
     }
