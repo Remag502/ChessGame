@@ -122,7 +122,7 @@ public class Display extends JFrame {
 				case KeyEvent.VK_RIGHT:
 					// Call method to roll forward a move
 //					System.out.println("Right arrow key pressed");
-//					Board.rollForward();
+					Board.rollForward();
 					break;
 				}
 			}

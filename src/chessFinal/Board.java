@@ -244,7 +244,15 @@ public class Board {
 	    Piece[][] boardState = Display.getMoveHistory().get(trackMoves);
 	    restoreBoardState(boardState);
 	}
-
+	
+	public static void rollForward() {
+		if (trackMoves+1 == Display.getMoveHistory().size())
+			return;
+		trackMoves++;
+		Piece[][] boardState = Display.getMoveHistory().get(trackMoves);
+		restoreBoardState(boardState);
+	}
+	
 	public static void restoreBoardState(Piece[][] boardState) {
 	    Board board = Display.getBoard();
 	    for (int i = 0; i < 8; i++) {
@@ -256,14 +264,6 @@ public class Board {
 	    board.moves = trackMoves;
 	    board.whiteTurn = (board.moves % 2 == 0) ? true: false;
 	}
-	
-//	public static void rollForward() {
-//		Board board = Display.getBoard();
-//		if (board.moves >= Display.getMoveHistory().size()) // Checks that isnt last played move
-//			return;
-//		board = Display.getMoveHistory().get(board.moves+1);
-//		changeBoard(board);
-//	}
 
 	public static void addBoardToHistory() {
 		// Remove moves until caught up to current position
