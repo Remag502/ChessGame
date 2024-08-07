@@ -123,7 +123,10 @@ public class Board {
 		// Change piece
 		Display.getBoard().squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
-
+		// Check if position has king in check
+		if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK))
+			System.out.println("Implement somthing here");
+		
 		square.repaintSquare();
 		Display.getBoard().squares[x][y].repaintSquare();
 
@@ -331,6 +334,32 @@ public class Board {
 //	    currentBoard.repaintBoard();
 	}
 
+	private static boolean isKingInCheck(boolean isWhite) {
+		
+		Point location = findKing(isWhite);
+		Piece king = Display.getBoard().squares[location.x][location.y].getPiece();
+		if (king.onTargetedSquare(location.x, location.y)) 
+			return true;
+		
+		return false;
+	}
+	
+	public static Point findKing(boolean isWhite) {
+	    for (int x = 0; x < 8; x++) {
+	        for (int y = 0; y < 8; y++) {
+	            Piece piece = Display.getBoard().squares[x][y].getPiece();
+	            if (piece != null && piece.type == Piece.KING && piece.side() == isWhite) {
+	                return new Point(x, y);
+	            }
+	        }
+	    }
+	    return null; // King not found (shouldn't happen if the board is properly set up)
+	}
+	
+	public Square[][] getSquares() {
+		return squares;
+	}
+	
 	// Create a deep copy
 	@Override
 	public Board clone() {

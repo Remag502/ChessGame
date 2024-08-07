@@ -316,6 +316,52 @@ public class Piece {
 		return moves;
 	}
 	
+	public boolean onTargetedSquare(int x, int y) {
+		// Get list of positions where an enemy can be
+		ArrayList<Point> pawnAttacks, knightAttacks, bishopAttacks, rookAttacks, kingAttacks;
+		pawnAttacks = pawnCapture(x, y);
+		knightAttacks = knightMoves(x, y);
+		bishopAttacks = bishopMoves(x, y);
+		rookAttacks = rookMoves(x, y);
+		kingAttacks = kingMoves(x, y);
+		// Check if lists contains enemy pieces
+		Board board = Display.getBoard();
+		
+		// Only opponent pieces show up, because you cant capture your own side piece
+		for (Point pos: pawnAttacks) {
+			Piece piece = board.getSquares()[pos.x][pos.y].getPiece();
+			if ((piece != null ? piece.type : -1 ) == Piece.PAWN)
+				return true;
+		}
+		for (Point pos: knightAttacks) {
+			Piece piece = board.getSquares()[pos.x][pos.y].getPiece();			
+			if ((piece != null ? piece.type : -1 ) == Piece.KNIGHT)
+				return true;
+		}
+		for (Point pos: bishopAttacks) {
+			Piece piece = board.getSquares()[pos.x][pos.y].getPiece();	
+			if ((piece != null ? piece.type : -1 ) == Piece.BISHOP)
+				return true;
+			if ((piece != null ? piece.type : -1 ) == Piece.QUEEN)
+				return true;
+		}
+		for (Point pos: rookAttacks) {
+			Piece piece = board.getSquares()[pos.x][pos.y].getPiece();	
+			if ((piece != null ? piece.type : -1 ) == Piece.ROOK)
+				return true;
+			if ((piece != null ? piece.type : -1 ) == Piece.QUEEN)
+				return true;
+		}
+		for (Point pos: kingAttacks) {
+			Piece piece = board.getSquares()[pos.x][pos.y].getPiece();	
+			if ((piece != null ? piece.type : -1 ) == Piece.KING)
+				return true;
+		}
+		
+		// No enemy found
+		return false;
+	}
+	
 	public static boolean isWhiteKingMoved() {
 		return whiteKingMoved;
 	}
