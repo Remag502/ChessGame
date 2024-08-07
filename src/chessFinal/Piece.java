@@ -16,6 +16,7 @@ public class Piece {
 	public static final boolean BLACK = false;
 
 	public static boolean whiteKingMoved = false, blackKingMoved = false; // move to board?
+	
 	private boolean isWhite;
 	public int type;
 
@@ -27,7 +28,7 @@ public class Piece {
 	public boolean side() {
 		return isWhite;
 	}
-
+	
 	// Returns possible moves from piece given a location,
 	// in a point ArrayList
 	public ArrayList<Point> getPieceMoves(int x, int y) {
@@ -100,15 +101,6 @@ public class Piece {
 		addMove(moves, x + 2, y - 1);
 		addMove(moves, x - 1, y - 2);
 		addMove(moves, x + 1, y - 2);
-
-//		moves.add(new Point(x-1, y+2));
-//		moves.add(new Point(x+1, y+2));
-//		moves.add(new Point(x-2, y+1));
-//		moves.add(new Point(x+2, y+1));
-//		moves.add(new Point(x-2, y-1));
-//		moves.add(new Point(x+2, y-1));
-//		moves.add(new Point(x-1, y-2));
-//		moves.add(new Point(x+1, y-2));
 
 		return moves;
 	}
@@ -262,15 +254,6 @@ public class Piece {
 		addMove(moves, x, y - 1);
 		addMove(moves, x + 1, y - 1);
 
-//		moves.add(new Point(x+1, y));
-//		moves.add(new Point(x+1, y+1));
-//		moves.add(new Point(x, y+1));
-//		moves.add(new Point(x-1, y+1));
-//		moves.add(new Point(x-1, y));
-//		moves.add(new Point(x-1, y-1));
-//		moves.add(new Point(x, y-1));
-//		moves.add(new Point(x+1, y-1));
-
 		return moves;
 
 	}
@@ -339,6 +322,11 @@ public class Piece {
 
 	public static boolean isBlackKingMoved() {
 		return blackKingMoved;
+	}
+	
+	@Override
+	public Piece clone() {
+		return new Piece(this.type, this.side());
 	}
 
 }

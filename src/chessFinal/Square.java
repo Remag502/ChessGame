@@ -219,5 +219,20 @@ public class Square extends JPanel {
         img.setLocation(p.x - img.getWidth() / 2, p.y - img.getHeight() / 2);
         Display.layeredPane.repaint();
     }
+    
+    @Override
+    public Square clone() {
+    	Square clonedSquare = new Square(this.defaultColor, this.posX, this.posY);
+        
+        // Deep copy the piece if it's not null
+        if (this.piece != null) {
+            clonedSquare.setPiece((Piece) this.piece.clone());
+        }
+        
+        // Set the icon for the cloned square's JLabel based on the piece
+//        clonedSquare.repaintSquare();
+
+        return clonedSquare;
+    }
 }
 

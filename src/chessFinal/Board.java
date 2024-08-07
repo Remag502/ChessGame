@@ -17,12 +17,22 @@ public class Board {
 
 	// Class stores data of JPanels
 	// Handles logical components of game
-	private static Square[][] squares = new Square[8][8];
-	private static boolean whiteTurn = true;
-
+	private Square[][] squares;
+	private boolean whiteTurn;
+	private int moves;
+	
+	public Board() {
+		whiteTurn = true;
+		squares = new Square[8][8];
+		moves = 0;
+	}
+	
 	// Uses given JPanel to display contents of board
 	public Board(JPanel boardPanel) {
-
+		
+		whiteTurn = true;
+		squares = new Square[8][8];
+		moves = 0;
 		boardPanel.setBorder(new EmptyBorder(0, 5, 5, 5));
 		boardPanel.setLayout(new GridLayout(8, 8, 0, 0)); // Chess layout
 		initializeBackground(boardPanel);
@@ -108,21 +118,23 @@ public class Board {
 		// Check special cases
 		checkSpecialCases(square.getPiece(), x, y);
 		// Change piece
-		squares[x][y].setPiece(square.getPiece());
+		Display.getBoard().squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
 
 		square.repaintSquare();
-		squares[x][y].repaintSquare();
+		Display.getBoard().squares[x][y].repaintSquare();
+		
+		addBoardToHistory();
 	}
 
 	public static void forceMovePiece(Square square, int x, int y) {
 
 		// Change piece
-		squares[x][y].setPiece(square.getPiece());
+		Display.getBoard().squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
 
 		square.repaintSquare();
-		squares[x][y].repaintSquare();
+		Display.getBoard().squares[x][y].repaintSquare();
 	}
 
 	public static Point findSquareCoordsWithLabel(JLabel label) {
@@ -130,13 +142,13 @@ public class Board {
 		Point bestMatch = null;
 		// Get the bounds of the JLabel
 		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(),
-				squares[0][0].getParent());
+				Display.getBoard().squares[0][0].getParent());
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 
 				// Get the bounds of the JPanel
-				Rectangle panelBounds = squares[i][j].getBounds();
+				Rectangle panelBounds = Display.getBoard().squares[i][j].getBounds();
 				// Calculate the intersection area
 				Rectangle intersection = labelBounds.intersection(panelBounds);
 				int intersectionArea = intersection.width * intersection.height;
@@ -155,7 +167,7 @@ public class Board {
 	private static boolean legalMove(Square square, int x, int y) {
 
 		// Check if is its the player's turn
-		if (square.getPiece().side() != whiteTurn)
+		if (square.getPiece().side() != Display.getBoard().whiteTurn)
 			return false;
 		// Get piece moves in Point array
 		ArrayList<Point> moves = square.getPiece().getPieceMoves(square.getPosX(), square.getPosY());
@@ -165,7 +177,7 @@ public class Board {
 		for (int i = 0; i < moves.size(); i++) {
 //			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
 			if (moves.get(i).x == x && moves.get(i).y == y) {
-				whiteTurn = !whiteTurn;
+				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
 				return true; // Legal move found!
 			}
 		}
@@ -186,7 +198,7 @@ public class Board {
 	public static boolean emptySquare(int x, int y) {
 		if (x < 0 || x > 7 || y < 0 || y > 7)
 			return false; // Bounds check
-		if (squares[x][y].getPiece() == null)
+		if (Display.getBoard().squares[x][y].getPiece() == null)
 			return true;
 		return false;
 	}
@@ -196,7 +208,7 @@ public class Board {
 		if (x < 0 || x > 7 || y < 0 || y > 7)
 			return false; // Bounds check
 
-		Piece piece = squares[x][y].getPiece();
+		Piece piece = Display.getBoard().squares[x][y].getPiece();
 		if (piece == null)
 			return false; // null check
 
@@ -209,19 +221,123 @@ public class Board {
 		if (piece.type == Piece.KING) {
 
 			if (!Piece.isWhiteKingMoved() && (x == 6 && y == 0)) {
-				forceMovePiece(squares[7][0], 5, 0);
+				forceMovePiece(Display.getBoard().squares[7][0], 5, 0);
 //				squares[5][0].repaintSquare();
 			} else if (!Piece.isWhiteKingMoved() && (x == 2 && y == 0))
-				forceMovePiece(squares[0][0], 3, 0);
+				forceMovePiece(Display.getBoard().squares[0][0], 3, 0);
 			else if (!Piece.isBlackKingMoved() && (x == 6 && y == 7))
-				forceMovePiece(squares[7][7], 5, 7);
+				forceMovePiece(Display.getBoard().squares[7][7], 5, 7);
 			else if (!Piece.isBlackKingMoved() && (x == 2 && y == 7))
-				forceMovePiece(squares[0][7], 3, 7);
+				forceMovePiece(Display.getBoard().squares[0][7], 3, 7);
 			else if (piece.side() == Piece.WHITE)
 				Piece.whiteKingMoved = true;
 			else
 				Piece.blackKingMoved = true;
 		}
+	}
+	
+	public static void rollBack() {
+		Board board = Display.getBoard();
+		System.out.println(board);
+		if (board.moves <= 1) // Checks if a move has been played
+			return;
+		if (board.moves == Display.getMoveHistory().size()) // Latest move
+			board = Display.getMoveHistory().get(board.moves-2);
+		else
+			board = Display.getMoveHistory().get(board.moves-1);
+		System.out.println("Reached " + board.moves);
+		System.out.println(board);
+		changeBoard(board);
+//		board.resizeBoard(Display.boardPanel);
+	}
+	
+	public static void rollForward() {
+		Board board = Display.getBoard();
+		if (board.moves >= Display.getMoveHistory().size()) // Checks that isnt last played move
+			return;
+		board = Display.getMoveHistory().get(board.moves+1);
+		changeBoard(board);
+	}
+	
+	public static void addBoardToHistory() {
+//		Board board = Display.getBoard();
+//		board.moves++;
+//		Display.getMoveHistory().add(board);
+//		board = (Board) board.clone();
+//		// Copy so new moves dont affect old boards
+//		Display.setBoard(board);
+		
+		Board currentBoard = Display.getBoard().clone();
+	    Display.getMoveHistory().add(currentBoard);
+	    Display.getBoard().moves = Display.getMoveHistory().size(); // Update the moves variable based on history size
+	}
+	
+	public static void changeBoard(Board board) {
+	    Board currentBoard = Display.getBoard();
+	    // Copy over contents of squares array
+	    for (int i = 0; i < 8; i++) {
+	        for (int j = 0; j < 8; j++) {
+	            currentBoard.squares[i][j].setPiece(board.squares[i][j].getPiece() != null ? board.squares[i][j].getPiece().clone() : null);
+//	            currentBoard.squares[i][j].repaintSquare(); // Ensure the UI reflects the new data
+	        }
+	    }
+	    currentBoard.whiteTurn = board.whiteTurn;
+	    currentBoard.moves = board.moves;
+//	    currentBoard.repaintBoard();
+	}
+	
+	// Create a deep copy
+	@Override
+	public Board clone() {
+		Board rv = new Board(), original = Display.getBoard();
+		// Copy over contents of array
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				rv.squares[i][j] = (Square) original.squares[i][j].clone();
+//				rv.squares[i][j] = original.squares[i][j];
+			}
+		}
+		rv.whiteTurn = original.whiteTurn;
+		rv.moves = original.moves;
+		return rv;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+	    for (int y = 7; y >= 0; y--) { // Print from top to bottom (row 7 to 0)
+	        for (int x = 0; x < 8; x++) {
+	            Piece piece = squares[x][y].getPiece();
+	            if (piece == null) {
+	                sb.append(". ");
+	            } else {
+	                char pieceChar = ' ';
+	                switch (piece.type) {
+	                    case Piece.PAWN:
+	                        pieceChar = 'P';
+	                        break;
+	                    case Piece.ROOK:
+	                        pieceChar = 'R';
+	                        break;
+	                    case Piece.KNIGHT:
+	                        pieceChar = 'N'; // N for Knight to avoid conflict with King
+	                        break;
+	                    case Piece.BISHOP:
+	                        pieceChar = 'B';
+	                        break;
+	                    case Piece.QUEEN:
+	                        pieceChar = 'Q';
+	                        break;
+	                    case Piece.KING:
+	                        pieceChar = 'K';
+	                        break;
+	                }
+	                sb.append(piece.side() ? pieceChar : Character.toLowerCase(pieceChar)).append(" ");
+	            }
+	        }
+	        sb.append("\n"); // New line after each row
+	    }
+	    return sb.toString();
 	}
 	
 	// May implement later, useful for checks?
