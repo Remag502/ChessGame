@@ -118,8 +118,6 @@ public class Board {
 
 		if (!legalMove(square, x, y)) // Flips turn
 			return;
-		// Check special cases
-		checkSpecialCases(square.getPiece(), x, y);
 		// Change piece
 		Square backup = Display.getBoard().squares[x][y].clone();
 		Display.getBoard().squares[x][y].setPiece(square.getPiece());
@@ -133,6 +131,8 @@ public class Board {
 			// Change turn back to previous
 			Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
 		}
+		// Check special cases
+		checkSpecialCases(Display.getBoard().squares[x][y].getPiece(), x, y);
 		
 		if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK))
 			System.out.println("King is in check");
@@ -235,23 +235,55 @@ public class Board {
 	}
 
 	private static void checkSpecialCases(Piece piece, int x, int y) {
+		if (piece == null)
+			return; // In check, piece got moved back
 		if (piece.type == Piece.KING) {
-
-			if (!Piece.isWhiteKingMoved() && (x == 6 && y == 0)) {
-				forceMovePiece(Display.getBoard().squares[7][0], 5, 0);
-//				squares[5][0].repaintSquare();
-			} else if (!Piece.isWhiteKingMoved() && (x == 2 && y == 0))
-				forceMovePiece(Display.getBoard().squares[0][0], 3, 0);
-			else if (!Piece.isBlackKingMoved() && (x == 6 && y == 7))
-				forceMovePiece(Display.getBoard().squares[7][7], 5, 7);
-			else if (!Piece.isBlackKingMoved() && (x == 2 && y == 7))
-				forceMovePiece(Display.getBoard().squares[0][7], 3, 7);
-			else if (piece.side() == Piece.WHITE)
-				Piece.whiteKingMoved = true;
-			else
-				Piece.blackKingMoved = true;
+			castleKing(piece, x, y);
 		} else if (piece.type == Piece.PAWN && (y == 0 || y == 7)) // Checks if pawn is on end rows
 			promotePawn(piece);
+	}
+	
+	private static void castleKing(Piece piece, int x, int y) {
+		// Castle white right
+		if (!Piece.isWhiteKingMoved() && (x == 6 && y == 0)) { // On castle location
+			if (!(piece.onTargetedSquare(4, 0) || piece.onTargetedSquare(5, 0))) // Castle spots are not in check
+				forceMovePiece(Display.getBoard().squares[7][0], 5, 0); // Move the rook
+			else {
+				forceMovePiece(Display.getBoard().squares[6][0], 4, 0); // Set the king back
+				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+			}
+		// Castle white left
+		} else if (!Piece.isWhiteKingMoved() && (x == 2 && y == 0)) {
+			if (!(piece.onTargetedSquare(4, 0) || piece.onTargetedSquare(3, 0) || piece.onTargetedSquare(2, 0)))
+				forceMovePiece(Display.getBoard().squares[0][0], 3, 0);
+			else {
+				forceMovePiece(Display.getBoard().squares[2][0], 4, 0);
+				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+			}
+		}
+		// Castle black right
+		else if (!Piece.isBlackKingMoved() && (x == 6 && y == 7)) {
+			if (!(piece.onTargetedSquare(4, 7) || piece.onTargetedSquare(5, 7)))
+				forceMovePiece(Display.getBoard().squares[7][7], 5, 7);
+			else {
+				forceMovePiece(Display.getBoard().squares[6][7], 4, 7);
+				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+			}
+		}
+		// Castle black left
+		else if (!Piece.isBlackKingMoved() && (x == 2 && y == 7)) {
+			if (!(piece.onTargetedSquare(4, 7) || piece.onTargetedSquare(3, 7) && piece.onTargetedSquare(2, 7)))
+				forceMovePiece(Display.getBoard().squares[0][7], 3, 7);
+			else {
+				forceMovePiece(Display.getBoard().squares[2][7], 4, 7);
+				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+			}
+		}
+		// Piece has moved
+		else if (piece.side() == Piece.WHITE)
+			Piece.whiteKingMoved = true;
+		else
+			Piece.blackKingMoved = true;
 	}
 	
 	private static void promotePawn(Piece piece) {
