@@ -116,16 +116,26 @@ public class Board {
 
 	public static void movePiece(Square square, int x, int y) {
 
-		if (!legalMove(square, x, y))
+		if (!legalMove(square, x, y)) // Flips turn
 			return;
 		// Check special cases
 		checkSpecialCases(square.getPiece(), x, y);
 		// Change piece
+		Square backup = Display.getBoard().squares[x][y].clone();
 		Display.getBoard().squares[x][y].setPiece(square.getPiece());
 		square.setPiece(null);
 		// Check if position has king in check
+		if (isKingInCheck(!Display.getBoard().whiteTurn)) { // Pass in NOT turn, because its already changed
+			// Undo the move by swapping pieces
+			Piece storage = Display.getBoard().squares[x][y].getPiece();
+			Display.getBoard().squares[x][y].setPiece(backup.getPiece());
+			square.setPiece(storage);
+			// Change turn back to previous
+			Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+		}
+		
 		if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK))
-			System.out.println("Implement somthing here");
+			System.out.println("King is in check");
 		
 		square.repaintSquare();
 		Display.getBoard().squares[x][y].repaintSquare();
@@ -317,21 +327,6 @@ public class Board {
 		Display.getMoveHistory().add(boardState);
 		Display.getBoard().moves = Display.getMoveHistory().size()-1; // Update the moves variable
 		trackMoves = Display.getBoard().moves;
-	}
-
-	public static void changeBoard(Board board) {
-		Board currentBoard = Display.getBoard();
-		// Copy over contents of squares array
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				currentBoard.squares[i][j].setPiece(
-						board.squares[i][j].getPiece() != null ? board.squares[i][j].getPiece().clone() : null);
-//	            currentBoard.squares[i][j].repaintSquare(); // Ensure the UI reflects the new data
-			}
-		}
-		currentBoard.whiteTurn = board.whiteTurn;
-		currentBoard.moves = board.moves;
-//	    currentBoard.repaintBoard();
 	}
 
 	private static boolean isKingInCheck(boolean isWhite) {

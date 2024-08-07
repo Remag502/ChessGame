@@ -32,6 +32,12 @@ public class Square extends JPanel {
 	private static ImageIcon WHITE_PAWN, WHITE_BISHOP, WHITE_ROOK, WHITE_KNIGHT, WHITE_QUEEN, WHITE_KING, BLACK_PAWN,
 			BLACK_BISHOP, BLACK_ROOK, BLACK_KNIGHT, BLACK_QUEEN, BLACK_KING;
 
+	public Square() {
+		img = new JLabel();
+		squareInstance = this;
+		handleInput();
+	}
+	
 	public Square(boolean defaultColor, int posX, int posY) {
 		
 		this.defaultColor = defaultColor;
@@ -222,7 +228,14 @@ public class Square extends JPanel {
     
     @Override
     public Square clone() {
-    	Square clonedSquare = new Square(this.defaultColor, this.posX, this.posY);
+    	Square clonedSquare = new Square();
+    	clonedSquare.defaultColor = this.defaultColor;
+    	clonedSquare.posX = this.posX;
+    	clonedSquare.posY = this.posY;
+    	if (defaultColor)
+			setBackground(Color.DARK_GRAY);
+		else
+			setBackground(Color.WHITE);
         
         // Deep copy the piece if it's not null
         if (this.piece != null) {
