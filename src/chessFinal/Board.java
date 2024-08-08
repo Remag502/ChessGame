@@ -389,49 +389,48 @@ public class Board {
 	
 	private static boolean checkForMate(boolean isWhite) {
 		
-//		Board board = Display.getBoard();
-//		ArrayList<Point> moves = new ArrayList<Point>();
-//		Piece piece;
-//		Point originalPosition, movePosition;
-//		int k = 0;
-//		// Get all possible moves for on side
-//		for (int i = 0; i < 8; i++) {
-//			for (int j = 0; j < 8; j++) {
-//				piece = Display.getBoard().squares[i][j].getPiece();
-//				// Avoids empty squares, and other side pieces
-////				System.out.println("reached " + i + " " + j + " " + k++);
-//				if (piece == null || piece.side() != isWhite) 
-//					continue;
-//				// Get possible moves for square
-//				originalPosition = new Point(i, j);
-//				moves.addAll(piece.getPieceMoves(i, j));
-//				// Check if moves result in check after placement
-//				for (Point move: moves) {
-//					movePosition = new Point(move.x, move.y);
-//					// Simulate move
-//					Piece storage = board.squares[move.x][move.y].getPiece();
-//					board.squares[move.x][move.y].setPiece(piece);
-//					board.squares[i][j].setPiece(null);
-//					// Check if the king is still in check
-//	                boolean inCheck = isKingInCheck(isWhite);
-//	                if (!inCheck)
-//	                	System.out.println(Display.getBoard());
-//	                // Undo the move
-//	                board.squares[i][j].setPiece(piece);
-//	                board.squares[move.x][move.y].setPiece(storage);
-//	                // If at least one move gets the king out of check, it's not checkmate
-//	                if (!inCheck) {
-//	                    return false;
-//	                }
-//				}
-////				System.out.println(i + " " + j + " " + moves.size() + " " + piece.side());
-//				// Piece failed to find move that saves king, remove moves from list
-//				moves.clear();
-//			}
-//		}
-//		// No move gets king out of check, its checkmate!
-//		return true;
-		return false;
+		Board board = Display.getBoard();
+		ArrayList<Point> moves = new ArrayList<Point>();
+		Piece piece;
+		Point originalPosition, movePosition;
+		int k = 0;
+		// Get all possible moves for on side
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				piece = Display.getBoard().squares[i][j].getPiece();
+				// Avoids empty squares, and other side pieces
+//				System.out.println("reached " + i + " " + j + " " + k++);
+				if (piece == null || piece.side() != isWhite) 
+					continue;
+				// Get possible moves for square
+				originalPosition = new Point(i, j);
+				moves.addAll(piece.getPieceMoves(i, j));
+				// Check if moves result in check after placement
+				for (Point move: moves) {
+					movePosition = new Point(move.x, move.y);
+					// Simulate move
+					Piece storage = board.squares[move.x][move.y].getPiece();
+					board.squares[move.x][move.y].setPiece(piece);
+					board.squares[i][j].setPiece(null);
+					// Check if the king is still in check
+	                boolean inCheck = isKingInCheck(isWhite);
+	                if (!inCheck)
+	                	System.out.println(Display.getBoard());
+	                // Undo the move
+	                board.squares[i][j].setPiece(piece);
+	                board.squares[move.x][move.y].setPiece(storage);
+	                // If at least one move gets the king out of check, it's not checkmate
+	                if (!inCheck) {
+	                    return false;
+	                }
+				}
+//				System.out.println(i + " " + j + " " + moves.size() + " " + piece.side());
+				// Piece failed to find move that saves king, remove moves from list
+				moves.clear();
+			}
+		}
+		// No move gets king out of check, its checkmate!
+		return true;
 	}
 	
 	public Square[][] getSquares() {
