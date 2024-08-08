@@ -61,8 +61,6 @@ public class Piece {
 			return null;
 		}
 
-		moves.addAll(pawnCapture(x, y));
-
 		return moves;
 	}
 
@@ -278,7 +276,7 @@ public class Piece {
 				moves.add(new Point(x - 1, y + 1)); // captures left diagnol
 		} else {
 			if (Board.capturableSquare(x + 1, y - 1, isWhite))
-				moves.add(new Point(x - 1, y - 1)); // captures left diagnol
+				moves.add(new Point(x + 1, y - 1)); // captures left diagnol
 			if (Board.capturableSquare(x - 1, y - 1, isWhite))
 				moves.add(new Point(x - 1, y - 1)); // captures right diagnol
 		}
