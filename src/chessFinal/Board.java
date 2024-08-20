@@ -114,78 +114,93 @@ public class Board {
 
 	}
 
+//	public static void movePiece(Square square, int x, int y) {
+//
+//		if (!potentialMove(square, x, y)) // Flips turn
+//			return;
+//		// Change piece
+//		Square backup = Display.getBoard().squares[x][y].clone();
+//		Display.getBoard().squares[x][y].setPiece(square.getPiece());
+//		square.setPiece(null);
+//		// Check if position has king in check
+//		if (isKingInCheck(!Display.getBoard().whiteTurn)) { // Pass in NOT turn, because its already changed
+//			// Undo the move by swapping pieces
+//			Piece storage = Display.getBoard().squares[x][y].getPiece();
+//			Display.getBoard().squares[x][y].setPiece(backup.getPiece());
+//			square.setPiece(storage);
+//			// Change turn back to previous
+//			Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+//		}
+//		// Check special cases
+//		checkSpecialCases(Display.getBoard().squares[x][y].getPiece(), x, y);
+//		
+//		if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK)) {
+//			System.out.println("King is in check");
+//			if (checkForMate(Display.getBoard().whiteTurn))
+//				System.out.println("Checkmate");
+//		}
+//			
+//		
+//		square.repaintSquare();
+//		Display.getBoard().squares[x][y].repaintSquare();
+//
+//		addBoardToHistory();
+//		
+//	}
 	public static void movePiece(Square square, int x, int y) {
+	    // Check if the move is legal
+	    if (!legalMove(square, x, y)) {
+	        return; // Move is illegal, so do nothing
+	    }
+	    // Perform the move
+	    Display.getBoard().squares[x][y].setPiece(square.getPiece());
+	    square.setPiece(null);
+	    Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
 
-		if (!legalMove(square, x, y)) // Flips turn
-			return;
-		// Change piece
-		Square backup = Display.getBoard().squares[x][y].clone();
-		Display.getBoard().squares[x][y].setPiece(square.getPiece());
-		square.setPiece(null);
-		// Check if position has king in check
-		if (isKingInCheck(!Display.getBoard().whiteTurn)) { // Pass in NOT turn, because its already changed
-			// Undo the move by swapping pieces
-			Piece storage = Display.getBoard().squares[x][y].getPiece();
-			Display.getBoard().squares[x][y].setPiece(backup.getPiece());
-			square.setPiece(storage);
-			// Change turn back to previous
-			Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
-		}
-		// Check special cases
-		checkSpecialCases(Display.getBoard().squares[x][y].getPiece(), x, y);
-		
-		if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK)) {
-			System.out.println("King is in check");
-			if (checkForMate(Display.getBoard().whiteTurn))
-				System.out.println("Checkmate");
-		}
-			
-		
-		square.repaintSquare();
-		Display.getBoard().squares[x][y].repaintSquare();
+	    // Check for special cases such as check, checkmate, castling, or pawn promotion
+	    checkSpecialCases(Display.getBoard().squares[x][y].getPiece(), x, y);
 
-		addBoardToHistory();
-		
+	    // Display if a king is in check
+	    if (isKingInCheck(Piece.WHITE) || isKingInCheck(Piece.BLACK)) {
+	        System.out.println("King is in check");
+	        if (checkForMate(Display.getBoard().whiteTurn)) {
+	            System.out.println("Checkmate");
+	        }
+	    }
+
+	    // Repaint squares to update the GUI
+	    square.repaintSquare();
+	    Display.getBoard().squares[x][y].repaintSquare();
+
+	    // Add the board state to history for undo/redo functionality
+	    addBoardToHistory();
 	}
+	
+	public static boolean legalMove(Square square, int targetX, int targetY) {
+		if (!potentialMove(square, targetX, targetY)) // Flips turn
+			return false;
+		
+	    // Clone the current board state to backup for later restoration
+	    Square backup = Display.getBoard().squares[targetX][targetY].clone();
+	    Piece movedPiece = square.getPiece();
 
-	public static void forceMovePiece(Square square, int x, int y) {
+	    // Make the move
+	    Display.getBoard().squares[targetX][targetY].setPiece(movedPiece);
+	    square.setPiece(null);
 
-		// Change piece
-		Display.getBoard().squares[x][y].setPiece(square.getPiece());
-		square.setPiece(null);
+	    // Check if this move puts the king in check
+	    boolean isKingInCheck = isKingInCheck(movedPiece.side());
 
-		square.repaintSquare();
-		Display.getBoard().squares[x][y].repaintSquare();
+	    // Undo the move by restoring the previous board state
+	    square.setPiece(movedPiece);
+	    Display.getBoard().squares[targetX][targetY].setPiece(backup.getPiece());
+
+	    // Return true if the move does not put the king in check, otherwise false
+	    return !isKingInCheck;
 	}
-
-	public static Point findSquareCoordsWithLabel(JLabel label) {
-		int maxIntersectionArea = 0;
-		Point bestMatch = null;
-		// Get the bounds of the JLabel
-		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(),
-				Display.getBoard().squares[0][0].getParent());
-
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-
-				// Get the bounds of the JPanel
-				Rectangle panelBounds = Display.getBoard().squares[i][j].getBounds();
-				// Calculate the intersection area
-				Rectangle intersection = labelBounds.intersection(panelBounds);
-				int intersectionArea = intersection.width * intersection.height;
-
-				// Check if this is the largest intersection so far
-				if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
-					maxIntersectionArea = intersectionArea;
-					bestMatch = new Point(i, j);
-				}
-			}
-		}
-
-		return bestMatch;
-	}
-
-	private static boolean legalMove(Square square, int x, int y) {
+	
+	// Finds moves that are within current turn and according to the piece
+	private static boolean potentialMove(Square square, int x, int y) {
 
 		// Check if is its the player's turn
 		if (square.getPiece().side() != Display.getBoard().whiteTurn)
@@ -198,11 +213,21 @@ public class Board {
 		for (int i = 0; i < moves.size(); i++) {
 //			System.out.println("Legal moves: " + moves.get(i).x + " " + moves.get(i).y);
 			if (moves.get(i).x == x && moves.get(i).y == y) {
-				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+//				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
 				return true; // Legal move found!
 			}
 		}
 		return false;
+	}
+	
+	public static void forceMovePiece(Square square, int x, int y) {
+
+		// Change piece
+		Display.getBoard().squares[x][y].setPiece(square.getPiece());
+		square.setPiece(null);
+
+		square.repaintSquare();
+		Display.getBoard().squares[x][y].repaintSquare();
 	}
 
 	public static boolean freeSquare(int x, int y, boolean isWhite) {
@@ -215,6 +240,7 @@ public class Board {
 		// Has same side piece
 		return false;
 	}
+	
 
 	public static boolean emptySquare(int x, int y) {
 		if (x < 0 || x > 7 || y < 0 || y > 7)
@@ -246,6 +272,7 @@ public class Board {
 		} else if (piece.type == Piece.PAWN && (y == 0 || y == 7)) // Checks if pawn is on end rows
 			promotePawn(piece);
 	}
+	
 	
 	private static void castleKing(Piece piece, int x, int y) {
 		// Castle white right
@@ -374,6 +401,59 @@ public class Board {
 		
 		return false;
 	}
+	
+	public static void highlightPossibleMoves(Square square) {
+    	Board board = Display.getBoard();
+    	for (int i = 0; i < 8; i++) {
+    		for (int j = 0; j < 8; j++) {
+    			if (legalMove(square, i, j)) {
+    				
+    				Display.getBoard().squares[i][j].setBackground(Color.red);
+    			}
+        	}
+    	}
+    	
+    }
+    
+	public static void unhighlightPossibleMoves(Square square) {
+		Board board = Display.getBoard();
+    	for (int i = 0; i < 8; i++) {
+    		for (int j = 0; j < 8; j++) {
+    			if (legalMove(square, i, j)) {
+//    				Display.getBoard().whiteTurn = !Display.getBoard().whiteTurn;
+    				Display.getBoard().squares[i][j].defaultBackground();
+    			}
+        	}
+    	}
+    }
+	
+	public static Point findSquareCoordsWithLabel(JLabel label) {
+		int maxIntersectionArea = 0;
+		Point bestMatch = null;
+		// Get the bounds of the JLabel
+		Rectangle labelBounds = SwingUtilities.convertRectangle(label.getParent(), label.getBounds(),
+				Display.getBoard().squares[0][0].getParent());
+
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+
+				// Get the bounds of the JPanel
+				Rectangle panelBounds = Display.getBoard().squares[i][j].getBounds();
+				// Calculate the intersection area
+				Rectangle intersection = labelBounds.intersection(panelBounds);
+				int intersectionArea = intersection.width * intersection.height;
+
+				// Check if this is the largest intersection so far
+				if (!intersection.isEmpty() && intersectionArea > maxIntersectionArea) {
+					maxIntersectionArea = intersectionArea;
+					bestMatch = new Point(i, j);
+				}
+			}
+		}
+
+		return bestMatch;
+	}
+
 	
 	public static Point findKing(boolean isWhite) {
 	    for (int x = 0; x < 8; x++) {

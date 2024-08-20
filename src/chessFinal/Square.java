@@ -1,3 +1,18 @@
+// BUG LIST / FUTURE IMPLEMENTATIONS
+//vertical resize bug
+//
+//- needs en pessant
+//- needs checkmate popup, and game reset
+//- needs start menu
+//
+//- drag and drop should show possible moves *added*
+//- king in check highlights king square red
+//
+//- needs chess syntax
+//- going back moves, messes up white turn/black turn
+
+
+
 package chessFinal;
 
 import java.awt.Color;
@@ -69,6 +84,14 @@ public class Square extends JPanel {
 	
 	public Piece getPiece() {
 		return piece;
+	}
+	
+	public void defaultBackground() {
+		if (defaultColor)
+			setBackground(Color.DARK_GRAY);
+		else
+			setBackground(Color.WHITE);
+		repaintSquare();
 	}
 	
 	public void repaintSquare() {
@@ -164,12 +187,16 @@ public class Square extends JPanel {
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
 //				System.out.println("You clicked on square " + squareInstance.posX + " " + squareInstance.posY);
+				if (squareInstance.getPiece() != null)
+					Board.highlightPossibleMoves(squareInstance);
 				startImageFollowing(e);
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
+				if (squareInstance.getPiece() != null)
+					Board.unhighlightPossibleMoves(squareInstance);
 				Point pos = Board.findSquareCoordsWithLabel(img);
 				stopImageFollowing();
 				if (pos != null)
@@ -226,6 +253,15 @@ public class Square extends JPanel {
         Display.layeredPane.repaint();
     }
     
+//    private void highlightPossibleMoves(Square square) {
+//    	Board board = Display.getBoard();
+//    	
+//    }
+//    
+//    private void unhighlightPossibleMoves(Square square) {
+//    	
+//    }
+//    
     @Override
     public Square clone() {
     	Square clonedSquare = new Square();
